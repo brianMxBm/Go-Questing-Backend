@@ -2,12 +2,12 @@
   "name": "go-quest",
   "version": "1.0.0",
   "description": "N/A",
-  "main": "App.tsx",
+  "main": "App.ts",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
-    "start": "nodemon App.tsx"
+    "start": "nodemon App.ts"
   },
   "author": "",
   "license": "ISC",
