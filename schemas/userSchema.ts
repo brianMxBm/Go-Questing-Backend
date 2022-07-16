@@ -1,35 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TPYES
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    lowercase: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   image: {
     type: String,
-    defaultus: ''
+    default: "",
   },
   verified: {
     type: Boolean,
     default: false,
-    required: true
-  }
+    required: true,
+  },
 });
 
-userSchema.pre('save', async function _(next) {
+userSchema.pre("save", async function _(next) {
   // Hash password before sending it to the db.
-  if (this.isModified('password')) {
+  if (this.isModified("password")) {
     const hash = await bcrypt.hash(this.password, 8);
     this.password = hash;
   }
@@ -41,4 +41,4 @@ userSchema.methods.comparePassword = async function _(password: any) {
   return result;
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
