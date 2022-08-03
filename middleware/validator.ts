@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TPYES
+/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TPYES <-- TODO: FIX TYPOS
 import { check, validationResult } from "express-validator";
-
+import Express from "express";
 exports.validateUser = [
   check("name")
     .trim()
@@ -24,7 +24,11 @@ exports.validateSignUp = [
   check("password").trim().not().isEmpty().withMessage("Password is missing!"),
 ];
 
-exports.validate = (req: any, res: any, next: any) => {
+exports.validate = (
+  req: Express.Request,
+  res: Express.Response,
+  next: Express.NextFunction
+) => {
   const error = validationResult(req).array();
   if (!error.length) return next();
   res.status(400).json({ success: false, error: error[0].msg });

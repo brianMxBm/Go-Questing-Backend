@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TYPES
 /* eslint-disable @typescript-eslint/no-var-requires */ //TODO: REMOVE
-
+import Express from "express";
 const Job = require("../schemas/jobSchema");
-exports.createJob = async (req: any, res: any) => {
-  //TODO: Change Types.
+exports.createJob = async (req: Express.Request, res: Express.Response) => {
   const { postTitle, description, compensation, location, jobCategory } =
     req.body;
 
