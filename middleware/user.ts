@@ -1,28 +1,32 @@
 /* eslint-disable @typescript-eslint/no-var-requires */ //TODO: FIX IMPORTS
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TYPES
+import Express from "express";
+import { UserType } from "types/responseTypes";
+const { isValidObjectId } = require("mongoose");
+const User = require("../schemas/userSchema");
+const { sendError } = require("../utils/helper");
+const ResetToken = require("../schemas/resetTokenSchema");
 
-const { isValidObjectId } = require('mongoose');
-const User = require('../schemas/userSchema');
-const { sendError } = require('../utils/helper');
-const ResetToken = require('../schemas/resetTokenSchema');
-
-exports.isResetTokenValid = async (req: any, res: any, next: any) => {
+exports.isResetTokenValid = async (
+  req: Express.Request & { user: UserType & { _id: string } },
+  res: Express.Response,
+  next: Express.NextFunction
+) => {
   //TODO: Replace Types
   const { token, id } = req.query;
-  if (!token || !id) return sendError(res, 'Invalid request');
+  if (!token || !id) return sendError(res, "Invalid request");
 
-  if (!isValidObjectId(id)) return sendError(res, 'Invalid user');
+  if (!isValidObjectId(id)) return sendError(res, "Invalid user");
 
   const user = await User.findById(id);
-  if (!user) return sendError(res, 'User not found');
+  if (!user) return sendError(res, "User not found");
 
   const resetToken = await ResetToken.findOne({ owner: user._id });
 
-  if (!resetToken) return sendError(res, 'token not found');
+  if (!resetToken) return sendError(res, "token not found");
 
   const isValid = await resetToken.compareToken(token);
 
-  if (!isValid) return sendError(res, 'Reset token is not valid');
+  if (!isValid) return sendError(res, "Reset token is not valid");
 
   req.user = user;
 

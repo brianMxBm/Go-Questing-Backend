@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TYPES
 /* eslint-disable @typescript-eslint/no-var-requires */ //TODO: REMOVE
+import Express from "express";
+import { CustomExpressRequest } from "types/requestTypes";
 export {};
 const jwt = require("jsonwebtoken");
 const { isValidObjectId } = require("mongoose");
 const User = require("../schemas/userSchema");
+import { UserType } from "../types/responseTypes";
 const { sendError, createRandomBytes } = require("../utils/helper");
 const VerificationToken = require("../schemas/verificationSchema");
 const { generateVerificationCall } = require("../utils/verification");
@@ -16,7 +18,7 @@ const {
 } = require("../templates/emailTemplate");
 const ResetToken = require("../schemas/resetTokenSchema");
 
-exports.createUser = async (req: any, res: any) => {
+exports.createUser = async (req: Express.Request, res: Express.Response) => {
   //TODO: Change Types.
   const { name, email, password } = req.body;
   const user = await User.findOne({ email });
@@ -56,7 +58,7 @@ exports.createUser = async (req: any, res: any) => {
   return null; // TODO: Not good practice. Implement exception handling later.
 };
 
-exports.signin = async (req: any, res: any) => {
+exports.signin = async (req: Express.Request, res: Express.Response) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return sendError(res, "Email/Password Missing");
@@ -86,7 +88,7 @@ exports.signin = async (req: any, res: any) => {
   return null; // TODO: Not good practice. Implement exception handling later.
 };
 
-exports.verifyEmail = async (req: any, res: any) => {
+exports.verifyEmail = async (req: Express.Request, res: Express.Response) => {
   const { userId, token } = req.body;
   if (!userId || !token.trim())
     return sendError(res, "Invalid request, missing paramaters");
@@ -127,7 +129,10 @@ exports.verifyEmail = async (req: any, res: any) => {
   return null; // TODO: Not good practice. Implement exception handling later.
 };
 
-exports.forgotPassword = async (req: any, res: any) => {
+exports.forgotPassword = async (
+  req: Express.Request,
+  res: Express.Response
+) => {
   const { email } = req.body;
   if (!email) return sendError(res, "Please provide a valid email");
 
@@ -162,8 +167,13 @@ exports.forgotPassword = async (req: any, res: any) => {
   return null;
 };
 
-exports.resetPassword = async (req: any, res: any) => {
+exports.resetPassword = async (
+  req: Express.Request & { user: UserType & { _id: string } },
+  res: Express.Response
+) => {
   const { password } = req.body;
+  // console.log(JSON.stringify(req.headers));
+  // res.send("1959");
   const user = await User.findById(req.user._id);
   if (!user) return sendError(res, "user not found"); // We must check for user again
 
@@ -174,8 +184,7 @@ exports.resetPassword = async (req: any, res: any) => {
     // TODO: Place in validator.
     return sendError(res, "Password must be 8 to 20 characters long");
   }
-
-  user.password = password.trim();
+  req.user.password = password.trim();
   await user.save();
 
   await ResetToken.findOneAndDelete({ owner: user._id });
