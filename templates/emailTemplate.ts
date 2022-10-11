@@ -1,7 +1,8 @@
-// TODO: Implement proper templates in production
-//TODO: Modularize templats.
+// @TODO - Implement proper templates in production
+// @TODO - Modularize templates
 
-exports.generateEmailTemplate = (OTP: number) => `
+// Verification code email template
+const generateEmailTemplate = (OTP: string) => `
         <!DOCTYPE html>
         <html>
             <body>
@@ -10,7 +11,8 @@ exports.generateEmailTemplate = (OTP: number) => `
         </html>
     `;
 
-exports.welcomeEmailTemplate = (heading: string, message: string) => `
+// Welcome message email template
+const welcomeEmailTemplate = (heading: string, message: string) => `
     <!DOCTYPE html>
     <html>
         <body>
@@ -21,7 +23,8 @@ exports.welcomeEmailTemplate = (heading: string, message: string) => `
     </html>
 `;
 
-exports.forgotPasswordTemplate = (url: string) => `
+// Forgot password email template
+const forgotPasswordTemplate = (url: string) => `
     <!DOCTYPE html>
     <html>
         <body>
@@ -30,7 +33,8 @@ exports.forgotPasswordTemplate = (url: string) => `
     </html>
     `;
 
-exports.resetPasswordTemplate = (heading: string, message: string) => `
+// Reset password instructions email template
+const resetPasswordTemplate = (heading: string, message: string) => `
     <!DOCTYPE html>
     <html>
         <body>
@@ -39,3 +43,10 @@ exports.resetPasswordTemplate = (heading: string, message: string) => `
         </body>
     </html>
 `;
+
+export {
+  generateEmailTemplate,
+  welcomeEmailTemplate,
+  forgotPasswordTemplate,
+  resetPasswordTemplate,
+};

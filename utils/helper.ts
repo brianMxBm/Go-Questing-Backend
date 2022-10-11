@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ //TODO: FIX TPYES
 import crypto from "crypto";
-import Express from "express";
 
-exports.sendError = (res: Express.Response, error: string, status = 401) => {
-  // Function to help report errors
+import { Response } from "express";
+
+// Function to send errors
+const sendError = (res: Response, error: string, status = 401) => {
   res.status(status).json({ success: false, error });
 };
 
-exports.createRandomBytes = () =>
+// Function to generate random token
+const createRandomBytes = () =>
   new Promise((resolve, reject) => {
     crypto.randomBytes(30, (err, buff) => {
       if (err) reject(err);
@@ -16,3 +17,5 @@ exports.createRandomBytes = () =>
       resolve(token);
     });
   });
+
+export { sendError, createRandomBytes };

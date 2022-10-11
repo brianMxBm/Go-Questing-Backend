@@ -1,5 +1,6 @@
-import { Express } from "express";
-import { UserType } from "./responseTypes";
-export interface CustomExpressRequest {
-  req: Express.Request & { user: UserType };
+import { Request } from "express";
+import { IUser } from "../models/userModel";
+
+export interface CustomExpressRequest extends Request {
+  user?: IUser;
 }

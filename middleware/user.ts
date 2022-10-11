@@ -1,36 +1,48 @@
-/* eslint-disable @typescript-eslint/no-var-requires */ //TODO: FIX IMPORTS
-import Express from "express";
-import { UserType } from "types/responseTypes";
-const { isValidObjectId } = require("mongoose");
-const User = require("../schemas/userSchema");
-const { sendError } = require("../utils/helper");
-const ResetToken = require("../schemas/resetTokenSchema");
+import { isValidObjectId } from "mongoose";
 
-exports.isResetTokenValid = async (
-  req: Express.Request & { user: UserType & { _id: string } },
-  res: Express.Response,
-  next: Express.NextFunction
+import User from "../models/userModel";
+import ResetToken from "../models/resetTokenModel";
+
+import { sendError } from "../utils/helper";
+
+import { Response, NextFunction } from "express";
+import { CustomExpressRequest } from "../types/requestTypes";
+
+// Verify reset token validity
+const isResetTokenValid = async (
+  req: CustomExpressRequest,
+  res: Response,
+  next: NextFunction
 ) => {
-  //TODO: Replace Types
-  const { token, id } = req.query;
-  if (!token || !id) return sendError(res, "Invalid request");
+  try {
+    const { token, id } = req.query;
+    if (!token || !id) return sendError(res, "Invalid request");
 
-  if (!isValidObjectId(id)) return sendError(res, "Invalid user");
+    if (!isValidObjectId(id)) return sendError(res, "Invalid user");
 
-  const user = await User.findById(id);
-  if (!user) return sendError(res, "User not found");
+    const user = await User.findById(id);
+    if (!user) return sendError(res, "User not found");
 
-  const resetToken = await ResetToken.findOne({ owner: user._id });
+    const resetToken = await ResetToken.findOne({ owner: user._id });
 
-  if (!resetToken) return sendError(res, "token not found");
+    if (!resetToken) return sendError(res, "Token not found");
 
-  const isValid = await resetToken.compareToken(token);
+    const isValid = resetToken.compareToken(token as string);
 
-  if (!isValid) return sendError(res, "Reset token is not valid");
+    if (!isValid) return sendError(res, "Token is not valid");
 
-  req.user = user;
+    req.user = user;
 
-  next();
-
-  return null; // TODO: Not good practice. Implement exception handling later.
+    next();
+  } catch (e) {
+    if (typeof e === "string") {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e);
+    } else if (e instanceof Error) {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e.message);
+    }
+  }
 };
+
+export { isResetTokenValid };

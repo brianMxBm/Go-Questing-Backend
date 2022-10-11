@@ -1,10 +1,14 @@
-exports.generateVerificationCall = () => {
-  //Module generates a random four digit number
-  // TODO: Temporary, for prod. utilze an API to generate randm tokens.
-  let verificationCall = '';
-  for (let i = 0; i <= 3; i += 1) {
+// @TODO - For production: utilze an API to generate random tokens
+// Generate a random four digit number in the form of a string
+const generateVerificationNo = () => {
+  let verificationNo = "";
+
+  for (let i = 0; i < 4; ++i) {
     const randVal = Math.round(Math.random() * 9);
-    verificationCall += randVal;
+    verificationNo += randVal;
   }
-  return verificationCall;
+
+  return verificationNo;
 };
+
+export { generateVerificationNo };

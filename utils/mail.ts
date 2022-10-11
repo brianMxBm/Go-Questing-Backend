@@ -1,13 +1,16 @@
-// TODO: Switch over to stable mail api's in production
-/* eslint-disable */ //TODO: Not sure why this rule is affecting the import status?
-const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer";
 
-exports.mailTransport = () =>
+// @TODO - Switch over to stable mail API's in production
+
+// Create mail transporter
+const createMailTransporter = () =>
   nodemailer.createTransport({
-    host: 'smtp.mailtrap.io',
+    host: "smtp.mailtrap.io",
     port: 2525,
     auth: {
       user: process.env.MAILTRAP_USERNAME,
-      pass: process.env.MAILTRAP_PASSWORD
-    }
+      pass: process.env.MAILTRAP_PASSWORD,
+    },
   });
+
+export { createMailTransporter };
