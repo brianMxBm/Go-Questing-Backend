@@ -9,15 +9,24 @@ import { Request, Response } from "express";
 // @access  Private
 const createJob = async (req: Request, res: Response) => {
   try {
-    const { postTitle, description, compensation, location, jobCategory } =
-      req.body;
+    const {
+      postTitle,
+      description,
+      compensation,
+      address,
+      jobCategory,
+      latitude,
+      longitude,
+    } = req.body;
 
     if (
       !postTitle ||
       !description ||
       !compensation ||
-      !location ||
-      !jobCategory
+      !address ||
+      !jobCategory ||
+      !latitude ||
+      !longitude
     ) {
       return sendError(res, "Please provide a value for all fields!");
     }
@@ -26,8 +35,10 @@ const createJob = async (req: Request, res: Response) => {
       postTitle,
       description,
       compensation,
-      location,
+      address,
       jobCategory,
+      latitude,
+      longitude,
     });
 
     await job.save();

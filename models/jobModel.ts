@@ -4,8 +4,10 @@ export interface IJob extends mongoose.Document {
   postTitle: string;
   description: string;
   compensation: string;
-  location: string;
+  address: string;
   jobCategory: string;
+  latitude: string;
+  longitude: string;
 }
 
 const jobSchema = new mongoose.Schema<IJob>({
@@ -21,12 +23,20 @@ const jobSchema = new mongoose.Schema<IJob>({
     type: String,
     required: true,
   },
-  location: {
+  address: {
     type: String,
     required: true,
     default: "",
   },
   jobCategory: {
+    type: String,
+    required: true,
+  },
+  latitude: {
+    type: String,
+    required: true,
+  },
+  longitude: {
     type: String,
     required: true,
   },
