@@ -6,10 +6,11 @@ export interface IJob extends mongoose.Document {
   compensation: string;
   address: string;
   jobCategory: string;
-  latitude: string;
-  longitude: string;
+  location: {
+    type: string;
+    coordinates: number[];
+  };
 }
-
 const jobSchema = new mongoose.Schema<IJob>({
   postTitle: {
     type: String,
@@ -32,13 +33,9 @@ const jobSchema = new mongoose.Schema<IJob>({
     type: String,
     required: true,
   },
-  latitude: {
-    type: String,
-    required: true,
-  },
-  longitude: {
-    type: String,
-    required: true,
+  location: {
+    type: { type: String },
+    coordinates: [Number],
   },
   // user: {
   //   type: mongoose.Schema.Types.ObjectId,
@@ -46,7 +43,7 @@ const jobSchema = new mongoose.Schema<IJob>({
   //   ref: "User",
   // },
 });
-
+jobSchema.index({ location: "2dsphere" });
 const Job = mongoose.model("Job", jobSchema);
 
 export default Job;

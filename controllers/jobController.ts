@@ -8,6 +8,8 @@ import { Request, Response } from "express";
 // @route   POST /api/jobs/postJob
 // @access  Private
 const createJob = async (req: Request, res: Response) => {
+  console.log("type");
+
   try {
     const {
       postTitle,
@@ -15,18 +17,16 @@ const createJob = async (req: Request, res: Response) => {
       compensation,
       address,
       jobCategory,
-      latitude,
-      longitude,
+      location,
     } = req.body;
-
+    console.log(location.type);
     if (
       !postTitle ||
       !description ||
       !compensation ||
       !address ||
       !jobCategory ||
-      !latitude ||
-      !longitude
+      !location
     ) {
       return sendError(res, "Please provide a value for all fields!");
     }
@@ -37,8 +37,7 @@ const createJob = async (req: Request, res: Response) => {
       compensation,
       address,
       jobCategory,
-      latitude,
-      longitude,
+      location,
     });
 
     await job.save();
@@ -57,5 +56,32 @@ const createJob = async (req: Request, res: Response) => {
     }
   }
 };
+const getJobs = async (req: Request, res: Response) => {
+  try {
+    const { latitude, longitude } = req.body;
+    if (!latitude || !longitude) return sendError(res, "Invalide Coordinates");
 
-export { createJob };
+    const jobs = await Job.geoSearch({
+      geoSearch: "test",
+      near: [+latitude, +longitude],
+      maxDistance: 6,
+      search: { type: "jobs" },
+      limit: 30,
+    });
+    res.json({
+      success: true,
+      jobs: { jobs },
+    });
+
+    if (!jobs) return sendError(res, "no jobs in local area");
+  } catch (e) {
+    if (typeof e === "string") {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e);
+    } else if (e instanceof Error) {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e.message);
+    }
+  }
+};
+export { createJob, getJobs };
