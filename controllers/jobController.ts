@@ -8,8 +8,6 @@ import { Request, Response } from "express";
 // @route   POST /api/jobs/postJob
 // @access  Private
 const createJob = async (req: Request, res: Response) => {
-  console.log("type");
-
   try {
     const {
       postTitle,
@@ -19,7 +17,7 @@ const createJob = async (req: Request, res: Response) => {
       jobCategory,
       location,
     } = req.body;
-    console.log(location.type);
+
     if (
       !postTitle ||
       !description ||
@@ -56,6 +54,8 @@ const createJob = async (req: Request, res: Response) => {
     }
   }
 };
+
+// @TODO : Add @desc, @route, @access
 const getJobs = async (req: Request, res: Response) => {
   try {
     const { latitude, longitude } = req.body;
