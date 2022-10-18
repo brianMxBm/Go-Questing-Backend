@@ -1,14 +1,23 @@
 import mongoose from "mongoose";
 
 export interface IJob extends mongoose.Document {
+  user: mongoose.Types.ObjectId;
   postTitle: string;
   description: string;
   compensation: string;
-  location: string;
+  address: string;
   jobCategory: string;
+  location: {
+    type: "Point";
+    coordinates: number[];
+  };
 }
-
 const jobSchema = new mongoose.Schema<IJob>({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
   postTitle: {
     type: String,
     required: true,
@@ -21,7 +30,7 @@ const jobSchema = new mongoose.Schema<IJob>({
     type: String,
     required: true,
   },
-  location: {
+  address: {
     type: String,
     required: true,
     default: "",
@@ -30,12 +39,20 @@ const jobSchema = new mongoose.Schema<IJob>({
     type: String,
     required: true,
   },
-  // user: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  //   ref: "User",
-  // },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
 });
+
+jobSchema.index({ location: "2dsphere" });
 
 const Job = mongoose.model("Job", jobSchema);
 

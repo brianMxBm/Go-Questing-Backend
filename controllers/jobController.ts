@@ -2,32 +2,46 @@ import Job from "../models/jobModel";
 
 import { sendError } from "../utils/helper";
 
-import { Request, Response } from "express";
+import { Response } from "express";
+import { CustomExpressRequest } from "../types/requestTypes";
 
 // @desc    Create a job listing
 // @route   POST /api/jobs/postJob
 // @access  Private
-const createJob = async (req: Request, res: Response) => {
+const createJob = async (req: CustomExpressRequest, res: Response) => {
   try {
-    const { postTitle, description, compensation, location, jobCategory } =
-      req.body;
+    const user = req.user;
+    if (!user)
+      return sendError(res, "You must be logged in to perform this action!");
+
+    const {
+      postTitle,
+      description,
+      compensation,
+      address,
+      jobCategory,
+      location,
+    } = req.body;
 
     if (
       !postTitle ||
       !description ||
       !compensation ||
-      !location ||
-      !jobCategory
+      !address ||
+      !jobCategory ||
+      !location
     ) {
       return sendError(res, "Please provide a value for all fields!");
     }
 
     const job = new Job({
+      user: user.id,
       postTitle,
       description,
       compensation,
-      location,
+      address,
       jobCategory,
+      location,
     });
 
     await job.save();
