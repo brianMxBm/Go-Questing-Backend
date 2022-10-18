@@ -67,7 +67,7 @@ const jobValidator = [
     .not()
     .isEmpty()
     .withMessage("JobCategory is missing!"),
-  check("location").trim().not().isEmpty().withMessage("Location is missing!"),
+  check("location").not().isEmpty().withMessage("Location is missing!"),
 ];
 
 export {
