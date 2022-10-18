@@ -61,4 +61,33 @@ const createJob = async (req: CustomExpressRequest, res: Response) => {
   }
 };
 
-export { createJob };
+// @TODO : Add @desc, @route, @access
+const getJobs = async (req: Request, res: Response) => {
+  try {
+    const { latitude, longitude } = req.body;
+    if (!latitude || !longitude) return sendError(res, "Invalide Coordinates");
+
+    const jobs = await Job.geoSearch({
+      geoSearch: "test",
+      near: [+latitude, +longitude],
+      maxDistance: 6,
+      search: { type: "jobs" },
+      limit: 30,
+    });
+    res.json({
+      success: true,
+      jobs: { jobs },
+    });
+
+    if (!jobs) return sendError(res, "no jobs in local area");
+  } catch (e) {
+    if (typeof e === "string") {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e);
+    } else if (e instanceof Error) {
+      sendError(res, "Something went wrong", 500);
+      throw new Error(e.message);
+    }
+  }
+};
+export { createJob, getJobs };
