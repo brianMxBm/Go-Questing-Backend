@@ -58,16 +58,23 @@ const createJob = async (req: Request, res: Response) => {
 // @TODO : Add @desc, @route, @access
 const getJobs = async (req: Request, res: Response) => {
   try {
-    const { latitude, longitude } = req.body;
+    const { latitude, longitude } = req.query;
     if (!latitude || !longitude) return sendError(res, "Invalide Coordinates");
 
-    const jobs = await Job.geoSearch({
-      geoSearch: "test",
-      near: [+latitude, +longitude],
-      maxDistance: 6,
-      search: { type: "jobs" },
-      limit: 30,
-    });
+    const jobs = await Job.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [+longitude, +latitude],
+          },
+          distanceField: "dist.calculated",
+          maxDistance: 30000,
+          includeLocs: "dist.location",
+          spherical: true,
+        },
+      },
+    ]);
     res.json({
       success: true,
       jobs: { jobs },
