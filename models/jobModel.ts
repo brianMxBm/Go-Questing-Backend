@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IJob extends mongoose.Document {
+  user: mongoose.Types.ObjectId;
   postTitle: string;
   description: string;
   compensation: string;
@@ -12,6 +13,11 @@ export interface IJob extends mongoose.Document {
   };
 }
 const jobSchema = new mongoose.Schema<IJob>({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
   postTitle: {
     type: String,
     required: true,
@@ -44,11 +50,6 @@ const jobSchema = new mongoose.Schema<IJob>({
       required: true,
     },
   },
-  // user: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  //   ref: "User",
-  // },
 });
 
 jobSchema.index({ location: "2dsphere" });

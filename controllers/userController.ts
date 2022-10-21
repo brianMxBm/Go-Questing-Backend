@@ -17,6 +17,7 @@ import { createMailTransporter } from "../utils/mail";
 
 import { Request, Response } from "express";
 import { CustomExpressRequest } from "../types/requestTypes";
+import generateJWT from "../utils/generateJWT";
 
 // @desc    Register new user
 // @route   POST /api/user/create
@@ -85,22 +86,12 @@ const signin = async (req: Request, res: Response) => {
     const isMatched = user.comparePassword(password);
     if (!isMatched) return sendError(res, "Email/Password Does Not Match!");
 
-    if (!process.env.JWT_SECRET) {
-      return sendError(res, "Something went wrong");
-    }
-
-    // @TODO - Ryan: Save JWT
-    // const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    //   expiresIn: "1d",
-    // });
-
     res.json({
       success: true,
-      user: {
-        name: user.name,
-        email: user.email,
-        id: user._id,
-      },
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateJWT(user._id),
     });
   } catch (e) {
     if (typeof e === "string") {
@@ -198,7 +189,7 @@ const forgotPassword = async (req: Request, res: Response) => {
       to: user.email,
       subject: "Need to reset your credentials?",
       html: forgotPasswordTemplate(
-        `http://localhost:3000/reset-password?token=${randomToken}&id=${user._id}`
+        `http://localhost:3000/reset-password?token=${randomToken}`
       ),
     });
     res.json({
@@ -221,14 +212,16 @@ const forgotPassword = async (req: Request, res: Response) => {
 // @access  Private
 const resetPassword = async (req: CustomExpressRequest, res: Response) => {
   try {
-    if (!req.user?._id) return sendError(res, "Invalid request");
+    const userID = req.user?.id;
+
+    if (!userID) return sendError(res, "Invalid request");
+
+    const user = await User.findById(userID);
+    if (!user) return sendError(res, "User not found");
 
     const { password } = req.body;
 
     if (!password) return sendError(res, "Please enter a password");
-
-    const user = await User.findById(req.user._id);
-    if (!user) return sendError(res, "User not found");
 
     const isSamePass = user.comparePassword(password);
     if (isSamePass) return sendError(res, "You must choose a new password");
@@ -236,7 +229,6 @@ const resetPassword = async (req: CustomExpressRequest, res: Response) => {
     user.password = password.trim();
 
     await user.save();
-
     await ResetToken.findOneAndDelete({ owner: user._id });
 
     // @TODO - Replace credentials in production
