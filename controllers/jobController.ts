@@ -77,7 +77,7 @@ const getJobs = async (req: Request, res: Response) => {
     ]);
     res.json({
       success: true,
-      jobs: { jobs },
+      jobs,
     });
 
     if (!jobs) return sendError(res, "no jobs in local area");
