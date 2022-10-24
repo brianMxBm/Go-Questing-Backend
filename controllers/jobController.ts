@@ -3,12 +3,17 @@ import Job from "../models/jobModel";
 import { sendError } from "../utils/helper";
 
 import { Request, Response } from "express";
+import { CustomExpressRequest } from "../types/requestTypes";
 
 // @desc    Create a job listing
 // @route   POST /api/jobs/postJob
 // @access  Private
-const createJob = async (req: Request, res: Response) => {
+const createJob = async (req: CustomExpressRequest, res: Response) => {
   try {
+    const user = req.user;
+    if (!user)
+      return sendError(res, "You must be logged in to perform this action!");
+
     const {
       postTitle,
       description,
@@ -30,6 +35,7 @@ const createJob = async (req: Request, res: Response) => {
     }
 
     const job = new Job({
+      user: user.id,
       postTitle,
       description,
       compensation,
@@ -55,7 +61,9 @@ const createJob = async (req: Request, res: Response) => {
   }
 };
 
-// @TODO : Add @desc, @route, @access
+// @desc    Get nearby jobs
+// @route   GET /api/jobs/getJobs
+// @access  Public
 const getJobs = async (req: Request, res: Response) => {
   try {
     const { latitude, longitude } = req.query;
@@ -69,7 +77,6 @@ const getJobs = async (req: Request, res: Response) => {
             coordinates: [+longitude, +latitude],
           },
           distanceField: "dist.calculated",
-          maxDistance: 30000,
           includeLocs: "dist.location",
           spherical: true,
         },
@@ -91,4 +98,5 @@ const getJobs = async (req: Request, res: Response) => {
     }
   }
 };
+
 export { createJob, getJobs };

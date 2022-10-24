@@ -8,7 +8,7 @@ import {
   resetPassword,
 } from "../controllers/userController";
 
-import { isResetTokenValid } from "../middleware/user";
+import { isAuthenticated, isResetTokenValid } from "../middleware/auth";
 import {
   validateResult,
   registerShapeValidator,
@@ -24,6 +24,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword);
 router.post(
   "/reset-password",
+  isAuthenticated,
   isResetTokenValid,
   passwordShapeValidator,
   validateResult,
