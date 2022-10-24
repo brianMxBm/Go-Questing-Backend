@@ -77,7 +77,6 @@ const getJobs = async (req: Request, res: Response) => {
             coordinates: [+longitude, +latitude],
           },
           distanceField: "dist.calculated",
-          maxDistance: 3,
           includeLocs: "dist.location",
           spherical: true,
         },
@@ -85,7 +84,7 @@ const getJobs = async (req: Request, res: Response) => {
     ]);
     res.json({
       success: true,
-      jobs: { jobs },
+      jobs,
     });
 
     if (!jobs) return sendError(res, "no jobs in local area");
