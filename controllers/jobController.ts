@@ -82,6 +82,7 @@ const getJobs = async (req: Request, res: Response) => {
         },
       },
     ]);
+
     res.json({
       success: true,
       jobs,
